@@ -72,9 +72,8 @@
             extraPackages = with pkgs; [
               # VA-API 实现 (视频解码/编码硬件加速)
               libva
-              vaapiVdpau
-              # AMD 专用 VA-API 驱动
-              mesa.drivers
+              # VDPAU 后端 (已重命名)
+              libva-vdpau-driver
             ];
           };
           # AMD 开源驱动 (radv + radeonsi) 已由 Mesa 提供
