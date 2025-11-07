@@ -139,13 +139,13 @@
           };
 
           # ---------- 常用软件包（按需增删） ----------
-          environment.systemPackages = (environment.systemPackages or []) ++ with pkgs; [
-            alacritty
-            firefox
-            git
-            vim
-            htop
-            ripgrep
+          environment.systemPackages = (environment.systemPackages or []) ++ [
+            pkgs.alacritty
+            pkgs.firefox
+            pkgs.git
+            pkgs.vim
+            pkgs.htop
+            pkgs.ripgrep
           ];
 
           # ---------- Shell / dev tools ----------
