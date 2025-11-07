@@ -47,28 +47,6 @@
 
           nixpkgs.config.allowUnfree = true;
 
-          # ---------- Btrfs / 文件系统 ----------
-          fileSystems."/" = {
-            device = "/dev/disk/by-label/nixos-root";
-            fsType = "btrfs";
-            options = [ "subvol=root" "compress=zstd:3" "ssd" "space_cache=v2" ];
-          };
-          fileSystems."/home" = {
-            device = "/dev/disk/by-label/nixos-root";
-            fsType = "btrfs";
-            options = [ "subvol=home" "compress=zstd:3" "ssd" "space_cache=v2" ];
-          };
-          fileSystems."/nix" = {
-            device = "/dev/disk/by-label/nixos-root";
-            fsType = "btrfs";
-            options = [ "subvol=nix" "compress=zstd:1" "noatime" "ssd" "space_cache=v2" ];
-          };
-          fileSystems."/var" = {
-            device = "/dev/disk/by-label/nixos-root";
-            fsType = "btrfs";
-            options = [ "subvol=var" "compress=zstd:1" "noatime" "ssd" "space_cache=v2" ];
-          };
-
           # ---------- 引导 ----------
           boot.loader.systemd-boot.enable = true;
           boot.loader.efi.canTouchEfiVariables = true;
