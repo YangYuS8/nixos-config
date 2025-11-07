@@ -18,11 +18,15 @@
       modules = [
         ./hardware-configuration.nix
 
-        ({ config, pkgs, lib, ... }: {
-
+        ({ config, pkgs, lib, ... }: let
+            # 尝试安全取 noctalia 的 nixos module / package（外部 flake 未必提供）
+            noctaliaModule = if builtins.hasAttr "nixosModules" noctalia then noctalia.nixosModules.default else null;
+            noctaliaPkg = if builtins.hasAttr "packages" noctalia && builtins.hasAttr system noctalia.packages then noctalia.packages.${system}.default else null;
+          in
+        {
           # ---------- 基础 ----------
           networking.hostName = "nixos-laptop";
-          time.timeZone = "Asia/Tokyo";
+          time.timeZone = "Asia/Shanghai";
           i18n.defaultLocale = "zh_CN.UTF-8";
           i18n.extraLocales = [ "en_US.UTF-8" ];
 
@@ -31,7 +35,7 @@
             isNormalUser = true;
             description = "Primary user";
             extraGroups = [ "wheel" "video" "audio" ];
-            initialPassword = "CHANGE_ME"; # 安装后请立即用 `passwd` 修改或移除此字段并改用 SSH key
+            initialPassword = "CHANGE_ME"; # 安装后请立即 `passwd` 修改或移除此字段并使用 SSH key
             openssh.authorizedKeys.keys = [
               # "ssh-ed25519 AAAA.... yourkey@host"
             ];
@@ -39,7 +43,7 @@
 
           nixpkgs.config.allowUnfree = true;
 
-          # ---------- Btrfs / 文件系统（注意 device label 要匹配） ----------
+          # ---------- Btrfs / 文件系统 ----------
           fileSystems."/" = {
             device = "/dev/disk/by-label/nixos-root";
             fsType = "btrfs";
@@ -72,13 +76,15 @@
 
           # ---------- Niri + Noctalia ----------
           programs.niri.enable = true;
-          imports = [
-            noctalia.nixosModules.default
+
+          # 仅在 noctalia module 存在时导入（防止报错）
+          imports = lib.filter (x: x != null) [
+            noctaliaModule
           ];
 
           # ---------- 合并后的 systemPackages（唯一定义） ----------
           environment.systemPackages = let
-            myPkgs = [
+            basePkgs = [
               pkgs.alacritty
               pkgs.firefox
               pkgs.git
@@ -87,13 +93,13 @@
               pkgs.ripgrep
             ];
           in
-            myPkgs ++ [ noctalia.packages.${system}.default ];
+            basePkgs ++ (if noctaliaPkg != null then [ noctaliaPkg ] else []);
 
           # ---------- Display manager / Wayland ----------
+          # 使用 GDM（支持 Wayland 会话）。不要设置 desktopManager.default 或 windowManager.default。
           services.xserver.enable = true;
           services.xserver.displayManager.gdm.enable = true;
-          services.xserver.desktopManager.default = "none";
-          services.xserver.windowManager.default = "niri";
+          services.xserver.desktopManager = { }; # 保留空集以避免旧配置引用导致错误
 
           # ---------- 电源管理 ----------
           powerManagement.enable = true;
@@ -135,15 +141,16 @@
           security.sudo.enable = true;
           security.sudo.wheelNeedsPassword = true;
 
-          services = {
-            NetworkManager.enable = true;
-            sound.enable = true;
-            hardware.pulseaudio.enable = false;
-            hardware.pulseaudio.package = null;
-            services.pipewire.enable = true;
-            services.pipewire.media-session.enable = true;
-          };
+          # ---------- 网络 ----------
+          networking.networkmanager.enable = true;
 
+          # ---------- 音频 ----------
+          sound.enable = true;
+          hardware.pulseaudio.enable = false;
+          services.pipewire.enable = true;
+          services.pipewire.media-session.enable = true;
+
+          # ---------- 其它服务 ----------
           systemd.services."logrotate".enable = true;
 
         })
