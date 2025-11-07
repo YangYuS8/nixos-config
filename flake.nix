@@ -32,7 +32,12 @@
           networking.hostName = "nixos-laptop";
           time.timeZone = "Asia/Shanghai";
           i18n.defaultLocale = "zh_CN.UTF-8";
-          i18n.extraLocales = [ "en_US.UTF-8" ];
+          
+          # 支持的额外 locale (使用 supportedLocales)
+          i18n.supportedLocales = [ 
+            "zh_CN.UTF-8/UTF-8"
+            "en_US.UTF-8/UTF-8"
+          ];
 
           # ---------- 用户（不要把真实密码提交到仓库） ----------
           users.users.yangyus8 = {
