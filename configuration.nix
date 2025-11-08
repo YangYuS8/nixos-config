@@ -47,9 +47,9 @@
   };
 
   # 用户账户配置
-  users.users.<你的用户名> = {
+  users.users.yangyus8 = {
     isNormalUser = true;  # 创建普通用户
-    description = "<你的用户名>";  # 用户描述
+    description = "YangYuS8";  # 用户描述
     extraGroups = [ "networkmanager" "wheel" ];  # 添加用户到额外组（网络管理和sudo权限）
     packages = with pkgs; [ ];  # 用户专属包列表（当前为空）
   };
