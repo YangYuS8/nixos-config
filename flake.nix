@@ -52,6 +52,27 @@
 
           nixpkgs.config.allowUnfree = true;
 
+          # ---------- Nix 配置优化 ----------
+          nix.settings = {
+            # 使用国内镜像加速（中国用户推荐）
+            substituters = [
+              "https://mirrors.ustc.edu.cn/nix-channels/store"  # 中科大镜像
+              "https://mirror.sjtu.edu.cn/nix-channels/store"   # 上海交大镜像
+              "https://cache.nixos.org"                          # 官方源（后备）
+            ];
+            trusted-public-keys = [
+              "cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY="
+            ];
+            # 自动优化 store
+            auto-optimise-store = true;
+            # 增加网络超时
+            connect-timeout = 10;
+          };
+
+          # ---------- 网络代理（如需要，取消注释并配置） ----------
+          # networking.proxy.default = "http://127.0.0.1:7890";
+          # networking.proxy.noProxy = "127.0.0.1,localhost";
+
           # ---------- 引导 ----------
           boot.loader.systemd-boot.enable = true;
           boot.loader.efi.canTouchEfiVariables = true;

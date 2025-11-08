@@ -78,6 +78,9 @@ git clone https://github.com/YangYuS8/nixos-config.git
 # 复制生成的硬件配置（重要！）
 cp /mnt/etc/nixos/hardware-configuration.nix /mnt/home/nixos-config/
 
+# 启用flake
+export NIX_CONFIG="experimental-features = nix-command flakes"
+
 # 安装 NixOS
 sudo nixos-install --flake /mnt/home/nixos-config#laptop
 
